@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/thekatcodes/tinyapp/issues"
   },
-  "homepage": "https://github.com/thekatcodes/tinyapp#readme"
+  "homepage": "https://github.com/thekatcodes/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
