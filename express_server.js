@@ -9,6 +9,17 @@ const urlDatabase = {
 	"9sm5xK": "http://www.google.com",
 };
 
+function generateRandomString() {
+    let randomString = '';
+    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    for (let i = 0; i < 6 ; i++){
+        randomString += characters.charAt(Math.floor(Math.random()*characters.length))
+    }
+    return randomString;
+}
+generateRandomString()
+
 app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
 });
