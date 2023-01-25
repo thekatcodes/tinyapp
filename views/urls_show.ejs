@@ -22,13 +22,13 @@
 			</div>
 			<div class="card-footer text-muted">
 				<h5>Edit</h5>
-				<form action="/urls" method="POST">
+				<form action="/urls/<%= id %>" method="POST">
 					New URL:
 					<input
 						type="text"
 						placeholder="Enter new link here"
 					/>
-					<button>Submit</button>
+					<button type="submit">Submit</button>
 				</form>
 			</div>
 		</div>
