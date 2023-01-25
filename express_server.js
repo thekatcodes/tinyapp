@@ -34,6 +34,9 @@ app.get("/", (req, res) => {
 app.get("/hello", (req, res) => {
 	res.send("<html><body>Bonjour Hi World</body></html>");
 });
+app.get("/register", (req, res) => {
+	res.render("register");
+});
 app.post("/login", (req, res) => {
 	res.cookie("username", req.body.username);
 	res.redirect("/urls");
