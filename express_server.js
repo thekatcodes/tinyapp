@@ -66,6 +66,9 @@ app.post("/register", (req, res) => {
 
 	res.redirect("/urls");
 });
+app.get("/login", (req, res) => {
+    res.render("login");
+});
 app.post("/login", (req, res) => {
 	res.cookie("username", req.body.username);
 	res.redirect("/urls");
