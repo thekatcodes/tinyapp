@@ -29,6 +29,10 @@ app.get("/", (req, res) => {
 app.get("/hello", (req, res) => {
 	res.send("<html><body>Bonjour Hi World</body></html>");
 });
+app.post("/login", (req, res) => {
+    res.cookie('username',req.body.username);
+    res.redirect('/urls');
+  });
 app.get("/urls", (req, res) => {
 	const templateVars = { urls: urlDatabase };
 	res.render("urls_index", templateVars);
@@ -46,10 +50,7 @@ app.get("/urls/:id", (req, res) => {
     res.render("urls_show", templateVars);
 });
 app.post("/urls/:id", (req, res) => {
-    console.log(req.params.id)
     urlDatabase[req.params.id] = req.body.newURL;
-    console.log(req.body.newURL)
-    // console.log(urlDatabase[req.params.id])
     res.redirect('/urls');
   });
 app.post("/urls/:id/delete", (req, res) => {
