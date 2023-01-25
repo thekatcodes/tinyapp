@@ -11,8 +11,16 @@ const urlDatabase = {
 	"9sm5xK": "http://www.google.com",
 };
 
-const users = {
+const users = {};
 
+function getUserByEmail(email, users) {
+    for (let id in users) {
+        if (users[id].email === email) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 function generateRandomString() {
 	let randomString = "";
@@ -41,12 +49,21 @@ app.get("/register", (req, res) => {
 	res.render("register");
 });
 app.post("/register", (req, res) => {
-    let randomString = generateRandomString();
-    users[randomString] = { id: randomString, email: req.body.email, password: req.body.password };
-    res.cookie('user_id', randomString);
+    let submittedEmail = req.body.email;
+    if (req.body.email === '' || req.body.password === '') {
+        res.status(400).send("Please include both a valid email and password");
+    } else if (getUserByEmail(submittedEmail, users)) {
+        res.status(400).send("An account already exists for this email address")
+    } else {
+        let randomString = generateRandomString();
+        users[randomString] = { id: randomString, email: submittedEmail, password: req.body.password };
+        res.cookie('user_id', randomString);
+    }
+    console.log(users)
     // console.log(users)
     // console.log(users[randomString]);
     // console.log(req.cookies['user_id']);
+
 	res.redirect("/urls");
 });
 app.post("/login", (req, res) => {
