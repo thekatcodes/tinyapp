@@ -11,6 +11,9 @@ const urlDatabase = {
 	"9sm5xK": "http://www.google.com",
 };
 
+const users = {
+
+}
 function generateRandomString() {
 	let randomString = "";
 	let characters =
@@ -37,6 +40,15 @@ app.get("/hello", (req, res) => {
 app.get("/register", (req, res) => {
 	res.render("register");
 });
+app.post("/register", (req, res) => {
+    let randomString = generateRandomString();
+    users[randomString] = { id: randomString, email: req.body.email, password: req.body.password };
+    res.cookie('user_id', randomString);
+    // console.log(users)
+    // console.log(users[randomString]);
+    // console.log(req.cookies['user_id']);
+	res.redirect("/urls");
+});
 app.post("/login", (req, res) => {
 	res.cookie("username", req.body.username);
 	res.redirect("/urls");
@@ -46,7 +58,7 @@ app.post("/logout", (req, res) => {
 	res.redirect("/urls");
 });
 app.get("/urls", (req, res) => {
-	const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+    const templateVars = { urls: urlDatabase, user: users[req.cookies['user_id']] };
 	res.render("urls_index", templateVars);
 });
 app.post("/urls", (req, res) => {
@@ -56,7 +68,7 @@ app.post("/urls", (req, res) => {
 });
 app.get("/urls/new", (req, res) => {
 	const templateVars = {
-		username: req.cookies["username"],
+		user: users[req.cookies['user_id']],
 	};
 	res.render("urls_new", templateVars);
 });
@@ -64,7 +76,7 @@ app.get("/urls/:id", (req, res) => {
 	const templateVars = {
 		id: req.params.id,
 		longURL: urlDatabase[req.params.id],
-		username: req.cookies["username"],
+		user: users[req.cookies['user_id']],
 	};
 	res.render("urls_show", templateVars);
 });

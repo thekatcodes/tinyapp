@@ -31,7 +31,7 @@
 					href="/urls/new"
 					>Create New URL</a
 				>
-                <% if (!username) {%>
+                <% if (!user) {%>
 				<form
 					action="/login"
 					method="POST"
@@ -43,7 +43,7 @@
 					/><button type="submit">Sign in</button>
 				</form>
                 <% }else{ %>
-                    <h5>Logged in as: <%= username %></h5>
+                    <h5>Logged in as: <%= user.email %></h5>
                     <form
 					action="/logout"
 					method="POST"
