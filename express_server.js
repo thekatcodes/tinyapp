@@ -45,14 +45,17 @@ app.get("/urls/:id", (req, res) => {
     const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]};
     res.render("urls_show", templateVars);
 });
+app.post("/urls/:id", (req, res) => {
+    console.log(req.params.id)
+    urlDatabase[req.params.id] = req.body.newURL;
+    console.log(req.body.newURL)
+    // console.log(urlDatabase[req.params.id])
+    res.redirect('/urls');
+  });
 app.post("/urls/:id/delete", (req, res) => {
     delete urlDatabase[req.params.id];
     res.redirect('/urls');
 });
-// app.post("/urls/:id/", (req, res) => {
-//     // const longURL = urlDatabase[req.params.id]
-//     res.redirect('/urls');
-//   });
 app.get("/u/:id", (req, res) => {
     const longURL = urlDatabase[req.params.id];
     res.redirect(longURL);
