@@ -31,6 +31,7 @@
 					href="/urls/new"
 					>Create New URL</a
 				>
+                <% if (!username) {%>
 				<form
 					action="/login"
 					method="POST"
@@ -39,9 +40,17 @@
 						type="text"
 						name="username"
 						placeholder="Username"
-					/><button type="submit">Sign In</button>
+					/><button type="submit">Sign in</button>
 				</form>
-                <h5>Logged in as: <%= username %></h5>
+                <% }else{ %>
+                    <h5>Logged in as: <%= username %></h5>
+                    <form
+					action="/logout"
+					method="POST"
+				>
+				<button type="submit">Log out</button>
+				</form>
+                <% } %>
 			</div>
 		</div>
 	</nav>
