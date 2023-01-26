@@ -7,7 +7,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const urlDatabase = {
-	b2xVn2: "http://www.lighthouselabs.ca",
+	"b2xVn2": "http://www.lighthouselabs.ca",
 	"9sm5xK": "http://www.google.com",
 };
 
@@ -45,17 +45,21 @@ function generateRandomString() {
 }
 generateRandomString();
 
-app.get("/urls.json", (req, res) => {
+app.get("/urls.json", (_req, res) => {
 	res.json(urlDatabase);
 });
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
 	res.send("Hello!");
 });
-app.get("/hello", (req, res) => {
+app.get("/hello", (_req, res) => {
 	res.send("<html><body>Bonjour Hi World</body></html>");
 });
 app.get("/register", (req, res) => {
-	res.render("register");
+	const templateVars = {
+		urls: urlDatabase,
+		user: users[req.cookies["user_id"]],
+	};
+	res.render("register", templateVars);
 });
 app.post("/register", (req, res) => {
 	let submittedEmail = req.body.email;
@@ -80,13 +84,16 @@ app.post("/register", (req, res) => {
 	res.redirect("/urls");
 });
 app.get("/login", (req, res) => {
-	res.render("login");
+	const templateVars = {
+		urls: urlDatabase,
+		user: users[req.cookies["user_id"]],
+	};
+	res.render("login", templateVars);
 });
 app.post("/login", (req, res) => {
 	let submittedEmail = req.body.email;
 	let submittedPw = req.body.password;
 
-	// res.cookie("username", req.body.username);
 	if (!getUserByEmail(submittedEmail, users)) {
 		res.status(403).send("No match found for email and password");
 	} else if (
@@ -101,12 +108,10 @@ app.post("/login", (req, res) => {
 		res.cookie("user_id", users[req.cookies["user_id"]].id);
 		res.redirect("/urls");
     }
-    	console.log(req.cookies['user_id']);
-
 });
 app.post("/logout", (req, res) => {
-	res.clearCookie("username", req.body.username);
-	res.redirect("/urls");
+	res.clearCookie("user_id", req.cookies["user_id"]);
+	res.redirect("/login");
 });
 app.get("/urls", (req, res) => {
 	const templateVars = {
