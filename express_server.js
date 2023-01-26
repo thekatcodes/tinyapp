@@ -58,8 +58,12 @@ app.get("/register", (req, res) => {
 	const templateVars = {
 		urls: urlDatabase,
 		user: users[req.cookies["user_id"]],
-	};
-	res.render("register", templateVars);
+    };
+    if (!templateVars.user) {
+        res.render("register", templateVars);
+    } else {
+        res.redirect("/urls");
+    }
 });
 app.post("/register", (req, res) => {
 	let submittedEmail = req.body.email;
@@ -87,8 +91,12 @@ app.get("/login", (req, res) => {
 	const templateVars = {
 		urls: urlDatabase,
 		user: users[req.cookies["user_id"]],
-	};
-	res.render("login", templateVars);
+    };
+    if (!templateVars.user) {
+        res.render("login", templateVars);
+    } else {
+        res.redirect("/urls");
+    }
 });
 app.post("/login", (req, res) => {
 	let submittedEmail = req.body.email;
