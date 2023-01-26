@@ -1,10 +1,10 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-const cookieParser = require('cookie-parser')
+const cookieParser = require("cookie-parser");
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser())
+app.use(cookieParser());
 
 const urlDatabase = {
 	b2xVn2: "http://www.lighthouselabs.ca",
@@ -14,13 +14,22 @@ const urlDatabase = {
 const users = {};
 
 function getUserByEmail(email, users) {
-    for (let id in users) {
-        if (users[id].email === email) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+	for (let id in users) {
+		if (users[id].email === email) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+function getUserByPassword(password, users) {
+	for (let id in users) {
+		if (users[id].password === password) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
 function generateRandomString() {
 	let randomString = "";
@@ -49,36 +58,61 @@ app.get("/register", (req, res) => {
 	res.render("register");
 });
 app.post("/register", (req, res) => {
-    let submittedEmail = req.body.email;
-    if (req.body.email === '' || req.body.password === '') {
-        res.status(400).send("Please include both a valid email and password");
-    } else if (getUserByEmail(submittedEmail, users)) {
-        res.status(400).send("An account already exists for this email address")
-    } else {
-        let randomString = generateRandomString();
-        users[randomString] = { id: randomString, email: submittedEmail, password: req.body.password };
-        res.cookie('user_id', randomString);
-    }
-    console.log(users)
-    // console.log(users)
-    // console.log(users[randomString]);
-    // console.log(req.cookies['user_id']);
+	let submittedEmail = req.body.email;
+	if (req.body.email === "" || req.body.password === "") {
+		res.status(400).send("Please include both a valid email and password");
+	} else if (getUserByEmail(submittedEmail, users)) {
+		res.status(400).send("An account already exists for this email address");
+	} else {
+		let randomString = generateRandomString();
+		users[randomString] = {
+			id: randomString,
+			email: submittedEmail,
+			password: req.body.password,
+		};
+		res.cookie("user_id", randomString);
+	}
+	// console.log(users);
+	// console.log(users)
+	// console.log(users[randomString]);
+	// console.log(req.cookies['user_id']);
 
 	res.redirect("/urls");
 });
 app.get("/login", (req, res) => {
-    res.render("login");
+	res.render("login");
 });
 app.post("/login", (req, res) => {
-	res.cookie("username", req.body.username);
-	res.redirect("/urls");
+	let submittedEmail = req.body.email;
+	let submittedPw = req.body.password;
+
+	// res.cookie("username", req.body.username);
+	if (!getUserByEmail(submittedEmail, users)) {
+		res.status(403).send("No match found for email and password");
+	} else if (
+		getUserByEmail(submittedEmail, users) &&
+		!getUserByPassword(submittedPw, users)
+	) {
+		res.status(403).send("No match found for email and password");
+	} else if (
+		getUserByEmail(submittedEmail, users) &&
+		getUserByPassword(submittedPw, users)
+	) {
+		res.cookie("user_id", users[req.cookies["user_id"]].id);
+		res.redirect("/urls");
+    }
+    	console.log(req.cookies['user_id']);
+
 });
 app.post("/logout", (req, res) => {
 	res.clearCookie("username", req.body.username);
 	res.redirect("/urls");
 });
 app.get("/urls", (req, res) => {
-    const templateVars = { urls: urlDatabase, user: users[req.cookies['user_id']] };
+	const templateVars = {
+		urls: urlDatabase,
+		user: users[req.cookies["user_id"]],
+	};
 	res.render("urls_index", templateVars);
 });
 app.post("/urls", (req, res) => {
@@ -88,7 +122,7 @@ app.post("/urls", (req, res) => {
 });
 app.get("/urls/new", (req, res) => {
 	const templateVars = {
-		user: users[req.cookies['user_id']],
+		user: users[req.cookies["user_id"]],
 	};
 	res.render("urls_new", templateVars);
 });
@@ -96,7 +130,7 @@ app.get("/urls/:id", (req, res) => {
 	const templateVars = {
 		id: req.params.id,
 		longURL: urlDatabase[req.params.id],
-		user: users[req.cookies['user_id']],
+		user: users[req.cookies["user_id"]],
 	};
 	res.render("urls_show", templateVars);
 });
