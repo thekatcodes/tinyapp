@@ -9,7 +9,7 @@ app.use(cookieParser());
 app.use(morgan('tiny'));
 
 const urlDatabase = {
-    i3BoGr: {
+    "i3BoGr": {
     longURL: "https://www.google.ca",
     userID: "aJ48lW",
     },
@@ -52,14 +52,16 @@ const generateRandomString = function() {
 	return randomString;
 }
 
-// const urlsForUser = function(id, urlDatabase) {
-//     const userUrls = {};
-//     for (shortURL in urlDatabase) {
-//         userUrls = userUrls[shortURL].userID === id;
-
-//     }
-//     return userUrls
-// }
+/* Returns URLs where the userId is equal to the id of the currently logged-in user */
+const urlsForUser = function(id) {
+  const userUrls = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      userUrls[shortURL] = urlDatabase[shortURL];
+    }
+  }; 
+  return userUrls;
+}
 /****************************************** Application logic routes ******************************************/
 
 // app.get("/urls.json", (_req, res) => {
@@ -68,7 +70,7 @@ const generateRandomString = function() {
 
 // Redirect user to /urls page if logged in, otherwise redirect to /login
 app.get("/", (req, res) => {
-    const templateVars = {
+    let templateVars = {
 		urls: urlDatabase,
 		user: users[req.cookies["user_id"]],
     };
@@ -81,17 +83,19 @@ app.get("/", (req, res) => {
       
 // Render urls summary page
 app.get("/urls", (req, res) => {
-	const templateVars = {
-		urls: urlDatabase,
+	let templateVars = {
+		urls: urlsForUser(req.cookies["user_id"]),
 		user: users[req.cookies["user_id"]],
-	};
-    res.render("urls_index", templateVars);
-    console.log(urlDatabase)
+  };
+  console.log('urldatabase:', urlDatabase)
+  console.log('templatevars', templateVars)
+  console.log(req.cookies["user_id"])
+  res.render("urls_index", templateVars);
 });
 
 //Render new url form
 app.get("/urls/new", (req, res) => {
-	const templateVars = {
+	let templateVars = {
 		user: users[req.cookies["user_id"]],
     };
     if (!templateVars.user) {
@@ -103,17 +107,20 @@ app.get("/urls/new", (req, res) => {
 
 // Render page to show selected url info
 app.get("/urls/:id", (req, res) => {
-    urlDatabase[req.params.id].longURL;
-	const templateVars = {
-		id: req.params.id,
-		longURL: urlDatabase[req.params.id].longURL,
-		user: users[req.cookies["user_id"]],
-    };
-    if (!(req.params.id in urlDatabase)) {
-        res.send("ID does not exist");
-    } else {
-        res.render("urls_show", templateVars);
-    }
+	// urlDatabase[req.params.id].longURL;
+  let templateVars = {
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id].longURL,
+    urlUserID: urlDatabase[req.params.id].userID,
+    user: users[req.cookies["user_id"]],
+  };
+	if ((urlDatabase[req.params.id])) {
+    res.render("urls_show", templateVars);
+  } else {
+    res.status(404).send("This short URL does not correspond with a long URL at this time");
+  }
+  // console.log(templateVars.user)
+  // console.log(urlUserID)
 });
 
 // Redirect short url to long url
@@ -125,38 +132,51 @@ app.get("/u/:id", (req, res) => {
 // Shorten new url and redirect to that url
 app.post("/urls", (req, res) => {
     let shortUrl = generateRandomString();
-    
-    const templateVars = {
-		user: users[req.cookies["user_id"]],
-    };
-    if (!templateVars.user) {
-        res.status(401).send("You must be logged in to a valid account to create short URLs.");
-    } else {
-        urlDatabase[shortUrl] = {
+            urlDatabase[shortUrl] = {
             longURL: req.body.longURL,
             userID: users[req.cookies["user_id"]].id
         }
         res.redirect(`urls/${shortUrl}`);
-    }
+
 });
 
 // Update existing shortened url
 app.post("/urls/:id", (req, res) => {
-	urlDatabase[req.params.id].longURL = req.body.newURL;
-	res.redirect("/urls");
-});
+const userID = req.cookies["user_id"];
+const userUrls = urlsForUser(userID);
 
+  if (!(req.params.id in userUrls)) {
+    res.status(401).send("Unauthorized. This link is not in your personal URL inventory")
+  } else if (!userID) {
+    res.status(401).send('Please log in to an existing account to edit URL');
+  } else {
+    urlDatabase[req.params.id].longURL = req.body.newURL;
+    res.redirect("/urls");
+  }
+});
 // Delete existing shortened url
 app.post("/urls/:id/delete", (req, res) => {
-	delete urlDatabase[req.params.id];
-	res.redirect("/urls");
+  const userID = req.cookies["user_id"];
+  const userUrls = urlsForUser(userID);
+
+  // console.log('urldatabase:', urlDatabase);
+  // console.log('templatevars', templateVars);
+  // console.log(req.cookies["user_id"]);
+  if (!(req.params.id in userUrls)) {
+    res.status(401).send("Unauthorized. This link is not in your personal URL inventory")
+  } else if (!userID) {
+    res.status(401).send('Please log in to an existing account to delete URL');
+  } else {
+    delete urlDatabase[req.params.id];
+    res.redirect("/urls");
+  }
 });
 
 /****************************************** Authentication related routes ******************************************/
 
 // Render register form
 app.get("/register", (req, res) => {
-	const templateVars = {
+	let templateVars = {
 		urls: urlDatabase,
 		user: users[req.cookies["user_id"]],
     };
@@ -169,7 +189,7 @@ app.get("/register", (req, res) => {
 
 // Render login form
 app.get("/login", (req, res) => {
-	const templateVars = {
+	let templateVars = {
 		urls: urlDatabase,
 		user: users[req.cookies["user_id"]],
     };
@@ -202,7 +222,7 @@ app.post("/register", (req, res) => {
 
 // Authenticate and log user in
 app.post("/login", (req, res) => {
-    const templateVars = {
+    let templateVars = {
 		urls: urlDatabase,
 		user: users[req.cookies["user_id"]],
     };

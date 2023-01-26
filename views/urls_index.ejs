@@ -30,29 +30,35 @@
 					</tr>
 				</thead>
 				<tbody>
-					<% for (let id in urls) { %>
-					<tr>
-						<td><%= id %></td>
-						<td><%= urls[id].longURL %></td>
-						<td>
-							<form
-								method="GET"
-								action="/urls/<%= id %>"
-							>
-								<button type="submit">Edit</button>
-							</form>
-						</td>
-						<td>
-							<form
-								method="POST"
-								action="/urls/<%= id %>/delete"
-							>
-								<button type="submit">Delete</button>
-							</form>
-						</td>
-					</tr>
-					<% } %>
-				</tbody>
+         <% if(!user) { %>
+            <div class="alert alert-warning" role="alert">
+              Please <a href="/login" class="alert-link">login</a> or <a href="/register" class="alert-link">register</a> to see your collection of short URLs
+            </div>
+         <% } else { %>
+            <% for (let id in urls) { %>
+            <tr>
+              <td><%= id %></td>
+              <td><%= urls[id].longURL %></td>
+              <td>
+                <form
+                  method="GET"
+                  action="/urls/<%= id %>"
+                >
+                  <button type="submit">Edit</button>
+                </form>
+              </td>
+              <td>
+                <form
+                  method="POST"
+                  action="/urls/<%= id %>/delete"
+                >
+                  <button type="submit">Delete</button>
+                </form>
+              </td>
+            </tr>
+            <% } %>
+            <% } %>
+        </tbody>
 			</table>
 		</main>
 		<!-- Bootstrap JS -->
