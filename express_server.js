@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 const cookieParser = require("cookie-parser");
 const morgan = require('morgan');
+const bcrypt = require("bcryptjs");
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -202,19 +203,20 @@ app.get("/login", (req, res) => {
 
 // Add new user to database object
 app.post("/register", (req, res) => {
-	let submittedEmail = req.body.email;
+  let submittedEmail = req.body.email;
+  let submittedPassword = req.body.password;
 	if (req.body.email === "" || req.body.password === "") {
 		res.status(400).send("Please include both a valid email and password");
 	} else if (getUserByEmail(submittedEmail, users)) {
 		res.status(400).send("An account already exists for this email address");
 	} else {
-		let randomString = generateRandomString();
-		users[randomString] = {
-			id: randomString,
+		let newUserID = generateRandomString();
+		users[newUserID] = {
+			id: newUserID,
 			email: submittedEmail,
-			password: req.body.password,
+			password: bcrypt.hashSync(submittedPassword, 10),
 		};
-		res.cookie("user_id", randomString);
+		res.cookie("user_id", newUserID);
 	}
 
 	res.redirect("/urls");
@@ -227,19 +229,19 @@ app.post("/login", (req, res) => {
 		user: users[req.cookies["user_id"]],
     };
     
-	let submittedEmail = req.body.email;
-	let submittedPw = req.body.password;
+	const email = req.body.email;
+	const password = req.body.password;
 
-    if (!getUserByEmail(submittedEmail, users)) {
+    if (!getUserByEmail(email, users)) {
         res.status(403).send("No match found for email and password");
     } else if (
-        getUserByEmail(submittedEmail, users) &&
-        !getUserByPassword(submittedPw, users)
-    ) {
+        getUserByEmail(email, users) &&
+        !bcrypt.compareSync(password, users[newUserID].password))
+    {
         res.status(403).send("No match found for email and password");
     } else if (
-        getUserByEmail(submittedEmail, users) &&
-        getUserByPassword(submittedPw, users)
+        getUserByEmail(email, users) &&
+        getUserByPassword(password, users)
     ) {
         res.cookie("user_id", templateVars[users[req.cookies["user_id"]]].id);
 		res.redirect("/urls");
