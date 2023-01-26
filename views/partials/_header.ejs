@@ -31,28 +31,18 @@
 					href="/urls/new"
 					>Create New URL</a
 				>
-				<a
-					class="nav-item nav-link"
-					href="/register"
-					>Register</a
-				>
-
-				<a
-					class="nav-item nav-link"
-					href="/login"
-					>Log in</a
-				>
-				<!-- <% if (!user) {%>
-				<form
-					action="/login"
-					method="POST"
-				>
-					<input
-						type="text"
-						name="username"
-						placeholder="Username"
-					/><button type="submit">Sign in</button>
-				</form>
+				<% if (!user) {%>
+                    <a
+                        class="nav-item nav-link"
+                        href="/register"
+                        >Register</a
+                    >
+    
+                    <a
+                        class="nav-item nav-link"
+                        href="/login"
+                        >Log in</a
+                    >
                 <% }else{ %>
                     <h5>Logged in as: <%= user.email %></h5>
                     <form
@@ -61,7 +51,7 @@
 				>
 				<button type="submit">Log out</button>
 				</form>
-                <% } %> -->
+                <% } %>
 			</div>
 		</div>
 	</nav>
