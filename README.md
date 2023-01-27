@@ -4,13 +4,13 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 *Main page without an active user*
-!["Main page without an active user"](docs/main-page-no-user.png)
+!["Main page without an active user"](https://github.com/thekatcodes/tinyapp/blob/main/docs/main-page-no-user.png)
 *Main page with an active user, displaying created links*
-!["Main page with an active user, displaying created links"](docs/user-urls-page.png)
+!["Main page with an active user, displaying created links"](https://github.com/thekatcodes/tinyapp/blob/main/docs/user-urls-page.png)
 *Registration page*
-!["Registration page"](docs/registration-page.png)
+!["Registration page"](https://github.com/thekatcodes/tinyapp/blob/main/docs/registration-page.png)
 *Specific short URL page where user owns the short URL*
-!["Specific short URL page where user owns the short URL"](docs/user-shorturl.png)
+!["Specific short URL page where user owns the short URL"](https://github.com/thekatcodes/tinyapp/blob/main/docs/user-shorturl.png)
 ## Dependencies
 
 - Node.js
