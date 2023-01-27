@@ -25,10 +25,6 @@ const users = {};
 
 /****************************************** Application logic routes ******************************************/
 
-// app.get("/urls.json", (_req, res) => {
-// 	res.json(urlDatabase);
-// });
-
 // Redirect user to /urls page if logged in, otherwise redirect to /login
 app.get("/", (req, res) => {
     if (cookieHasUser(req.session.user_id, users)) {
@@ -44,11 +40,6 @@ app.get("/urls", (req, res) => {
 		urls: urlsForUser(req.session.user_id, urlDatabase),
 		user: users[req.session.user_id],
   };
-  // console.log('urls:',templateVars.urls )
-  // console.log('urldatabase:', urlDatabase)
-  // console.log('templateVars:', templateVars.user)
-  // console.log(req.session.user_id)
-
   res.render("urls_index", templateVars);
 });
 
@@ -66,7 +57,6 @@ app.get("/urls/new", (req, res) => {
 
 // Render page to show selected url info
 app.get("/urls/:id", (req, res) => {
-	// urlDatabase[req.params.id].longURL;
 	if ((urlDatabase[req.params.id])) {
     let templateVars = {
       id: req.params.id,
@@ -78,8 +68,6 @@ app.get("/urls/:id", (req, res) => {
   } else {
     res.status(404).send("This short URL does not correspond with a long URL at this time");
   }
-  // console.log(templateVars.user)
-  // console.log(urlUserID)
 });
 
 // Redirect short url to long url
@@ -191,14 +179,8 @@ app.post("/register", (req, res) => {
 
 // Authenticate and log user in
 app.post("/login", (req, res) => {
-    // let templateVars = {
-		// urls: urlDatabase,
-		// user: users[req.session.user_id],
-    // };
-    
-	const email = req.body.email;
+  const email = req.body.email;
   const password = req.body.password;
-
   const userObj = getUserByEmail(email, users);
   
     if (getUserByEmail(email, users) === undefined) {
@@ -215,9 +197,6 @@ app.post("/login", (req, res) => {
       req.session.user_id = userObj.id;
 		  res.redirect("/urls");
     }
-    console.log(email)
-    console.log(users)
-    console.log(users.id)
 });
 
 // Log user out
@@ -230,5 +209,3 @@ app.post("/logout", (req, res) => {
 app.listen(PORT, () => {
 	console.log(`Example app listening on port ${PORT}!`);
 });
-
-module.exports = {urlDatabase, users}
