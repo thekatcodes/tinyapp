@@ -26,14 +26,14 @@
 			</div>
 		</div>
     <% if (!user) {%>
-      <div>
-        <a class="nav-item nav-link" href="/register">Register</a>
-        <a class="nav-item nav-link" href="/login">Log in</a>
+      <div class="navbar-nav">
+        <a class="nav-item nav-link" href="/register" style="margin: 1em">Register</a>
+        <a class="nav-item nav-link" href="/login" style="margin: 1em">Log in</a>
       </div>
     <% }else{ %>
       <form action="/logout" method="POST">
-      <h5>Logged in as:</h5> <%= user.email %>
-      <button type="submit">Log out</button>
+      Logged in as: <%= user.email %>
+      <button type="submit" class="btn btn-outline-light" style="margin: 1em">Log out</button>
     </form>
     <% } %>
 	</nav>
