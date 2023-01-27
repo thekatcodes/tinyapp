@@ -4,7 +4,7 @@ const PORT = 8080; // default port 8080
 const morgan = require('morgan');
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
-const { checkUserByEmail, getUserByEmail, generateRandomString, urlsForUser, cookieHasUser } = require("./helpers");
+const { getUserByEmail, generateRandomString, urlsForUser, cookieHasUser } = require("./helpers");
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('tiny'));
@@ -84,7 +84,8 @@ app.get("/urls/:id", (req, res) => {
 
 // Redirect short url to long url
 app.get("/u/:id", (req, res) => {
-  if (urlDatabase[req.params.shortURL]) {
+    console.log(urlDatabase)
+  if (urlDatabase[req.params.id]) {
     const longURL = urlDatabase[req.params.id].longURL;
     if (longURL === undefined) {
       res.status(302);
@@ -174,7 +175,7 @@ app.post("/register", (req, res) => {
 
 	if (submittedEmail === "" || submittedPassword === "") {
 		res.status(400).send("Please include both a valid email and password");
-	} else if (checkUserByEmail(submittedEmail, users)) {
+	} else if (getUserByEmail(submittedEmail, users) !== undefined) {
 		res.status(400).send("An account already exists for this email address");
 	} else {
 		const newUserID = generateRandomString();
@@ -200,20 +201,23 @@ app.post("/login", (req, res) => {
 
   const userObj = getUserByEmail(email, users);
   
-    if (!checkUserByEmail(email, users)) {
+    if (getUserByEmail(email, users) === undefined) {
         res.status(403).send("No account associated with this email");
     } else if (
-        checkUserByEmail(email, users) &&
+        getUserByEmail(email, users) !== undefined &&
         !bcrypt.compareSync(password, userObj.password))
     {
         res.status(403).send("Password entered does not match the provided email address");
     } else if (
-        checkUserByEmail(email, users) &&
+        getUserByEmail(email, users) !== undefined &&
         bcrypt.compareSync(password, userObj.password)
     ) {
       req.session.user_id = userObj.id;
 		  res.redirect("/urls");
     }
+    console.log(email)
+    console.log(users)
+    console.log(users.id)
 });
 
 // Log user out

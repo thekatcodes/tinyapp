@@ -1,21 +1,21 @@
-const {urlDatabase} = require("./express_server")
+// const {urlDatabase} = require("./express_server")
 /* Checks if given email corresponds to a user in a given database, returns true or false */
-const checkUserByEmail = function (email, users) {
-	for (let id in users) {
-		if (users[id].email === email) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-};
-/* Checks if given password corresponds to a user in a given database, returns true or false */
+// const checkUserByEmail = function (email, users) {
+// 	for (let id in users) {
+// 		if (users[id].email === email) {
+// 			return true;
+// 		} else {
+// 			return false;
+// 		}
+// 	}
+// };
+/* Takes an email and userDatabase and returns the user ID for the user with the given email address */
 const getUserByEmail = function (email, users) {
 	for (let id in users) {
 		if (users[id].email === email) {
 			return users[id];
 		}
-	}
+    }
 };
 
 /* Generates a random string, used for creating short URLs and userIDs */
@@ -54,7 +54,6 @@ const cookieHasUser = function (cookie, userDatabase) {
 };
 
 module.exports = {
-	checkUserByEmail,
 	getUserByEmail,
 	generateRandomString,
 	urlsForUser,
