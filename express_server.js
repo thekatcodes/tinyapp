@@ -4,10 +4,10 @@ const PORT = 8080; // default port 8080
 const morgan = require('morgan');
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
+const { checkUserByEmail, getUserByEmail, generateRandomString, urlsForUser, cookieHasUser } = require("./helpers");
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('tiny'));
-
 app.use(cookieSession({
   name: 'session',
   keys: ['katie'],
@@ -23,59 +23,6 @@ const urlDatabase = {
 
 const users = {};
 
-/* Checks if given email corresponds to a user in a given database, returns true or false */
-const checkUserByEmail = function(email, users) {
-	for (let id in users) {
-		if (users[id].email === email) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-}
-
-/* Checks if given password corresponds to a user in a given database, returns true or false */
-const getUserByEmail = function(email, users) {
-	for (let id in users) {
-		if (users[id].email === email) {
-			return users[id];
-		}
-	}
-}
-
-/* Generates a random string, used for creating short URLs and userIDs */
-const generateRandomString = function() {
-	let randomString = "";
-	let characters =
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-	for (let i = 0; i < 6; i++) {
-		randomString += characters.charAt(
-			Math.floor(Math.random() * characters.length)
-		);
-	}
-	return randomString;
-}
-
-/* Returns URLs where the userId is equal to the id of the currently logged-in user */
-const urlsForUser = function(id) {
-  const userUrls = {};
-  for (const shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      userUrls[shortURL] = urlDatabase[shortURL];
-    }
-  }; 
-  return userUrls;
-}
-
-/* Checks if current cookie corresponds with a user in the userDatabase */
-const cookieHasUser = function(cookie, userDatabase) {
-  for (const user in userDatabase) {
-    if (cookie === user) {
-      return true;
-    }
-  } return false;
-};
 /****************************************** Application logic routes ******************************************/
 
 // app.get("/urls.json", (_req, res) => {
@@ -94,12 +41,13 @@ app.get("/", (req, res) => {
 // Render urls summary page
 app.get("/urls", (req, res) => {
 	let templateVars = {
-		urls: urlsForUser(req.session.user_id),
+		urls: urlsForUser(req.session.user_id, urlDatabase),
 		user: users[req.session.user_id],
   };
-  console.log('urldatabase:', urlDatabase)
-  console.log('templatevars', templateVars)
-  console.log("userID encrypt", req.session.user_id)
+  // console.log('urls:',templateVars.urls )
+  // console.log('urldatabase:', urlDatabase)
+  // console.log('templateVars:', templateVars.user)
+  // console.log(req.session.user_id)
 
   res.render("urls_index", templateVars);
 });
@@ -165,7 +113,7 @@ app.post("/urls", (req, res) => {
 // Update existing shortened url
 app.post("/urls/:id", (req, res) => {
 const userID = req.session.user_id;
-const userUrls = urlsForUser(userID);
+const userUrls = urlsForUser(userID, urlDatabase);
 
   if (!(req.params.id in userUrls)) {
     res.status(401).send("Unauthorized. You do not have authorization to edit this short URL")
@@ -180,7 +128,7 @@ const userUrls = urlsForUser(userID);
 // Delete existing shortened url
 app.post("/urls/:id/delete", (req, res) => {
   const userID = req.session.user_id;
-  const userUrls = urlsForUser(userID);
+  const userUrls = urlsForUser(userID, urlDatabase);
 
   if (!(req.params.id in userUrls)) {
     res.status(401).send("Unauthorized. You do not have authorization to delete this short URL")
@@ -278,3 +226,5 @@ app.post("/logout", (req, res) => {
 app.listen(PORT, () => {
 	console.log(`Example app listening on port ${PORT}!`);
 });
+
+module.exports = {urlDatabase, users}
