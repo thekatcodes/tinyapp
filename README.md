@@ -27,3 +27,6 @@ TinyApp is a full stack web application built with Node and Express that allows 
 - Run the development web server using the `node express_server.js` command.
 - Register as a new user.
 - Start creating your own personal library of short URLs.
+
+## Thank You
+Thank you for taking the time to look at one of my projects!
